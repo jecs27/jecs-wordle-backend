@@ -27,29 +27,38 @@ const getTokenApplication = async(req, res) => {
             sMW
         } = req.body;
 
-        //let idApp = await decryptString(req.header('sMW') ? .split(' ')[1]);
-        let idApp = await decryptString(req.header('sMW').split(' ')[1]);
-        sMW = await decryptString(sMW);
+        if (req.header('sMW')) {
+            //let idApp = await decryptString(req.header('sMW')?.split(' ')[1]);
+            let idApp = await decryptString(req.header('sMW').split(' ')[1]);
+            sMW = await decryptString(sMW);
 
-        console.log(sMW, idApp);
+            console.log(sMW, idApp);
 
-        if (sMW == undefined || idApp == undefined || sMW != 'dd360-2712' || idApp != 'dd360-2712') {
+            if (sMW == undefined || idApp == undefined || sMW != 'dd360-2712' || idApp != 'dd360-2712') {
+                return res.status(409).send({
+                    status: 409,
+                    message: 'Ocurrió un error en la aplicación, intente de nuevo mas tarde.',
+                    data: {}
+                });
+            }
+            let sToken = generateToken({
+                sMW: moment().format('DD.MM.YYYY') + await crearHashMd5("-JECS2712"),
+            });
+            return res.status(200).send({
+                status: 200,
+                message: '_OK_',
+                data: {
+                    token: sToken
+                }
+            });
+        } else {
             return res.status(409).send({
                 status: 409,
                 message: 'Ocurrió un error en la aplicación, intente de nuevo mas tarde.',
                 data: {}
             });
         }
-        let sToken = generateToken({
-            sMW: moment().format('DD.MM.YYYY') + await crearHashMd5("-JECS2712"),
-        });
-        return res.status(200).send({
-            status: 200,
-            message: '_OK_',
-            data: {
-                token: sToken
-            }
-        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).send({

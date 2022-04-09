@@ -2,10 +2,10 @@
 const moment = require("moment");
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-    class tab_users extends Model {
+    class tab_words extends Model {
         static associate(models) {}
     }
-    tab_users.init({
+    tab_words.init({
         dFechaRegistro: {
             type: DataTypes.DATE,
             allowNull: false,
@@ -14,57 +14,35 @@ module.exports = (sequelize, DataTypes) => {
                 return moment.utc(this.getDataValue('dFechaRegistro')).local().format('YYYY-MM-DD HH:mm:ss');
             }
         },
-        nIdUsuario: {
+        nIdPalabra: {
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrementIdentity: true,
             autoIncrement: true,
             allowNull: false,
         },
-        sNombre: {
-            type: DataTypes.STRING(100),
+        sPalabra: { //electroencefalografista
+            type: DataTypes.STRING(25),
             allowNull: false,
-        },
-        sApellido_Paterno: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-        },
-        sApellido_Materno: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            defaultValue: ''
-        },
-        sCorreo: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-        },
-        sPassword: {
-            type: DataTypes.STRING(20),
-            allowNull: false,
-        },
-        nIntentos: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
         },
         sUuid: {
             type: DataTypes.UUID,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4,
         },
-        nEstatus: {
+        nEstatus: { //0 - sin usar 1 - en uso 2-usada
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 1,
+            defaultValue: 0,
         },
     }, {
         sequelize,
         timestamps: false,
         indexes: [
-            { fields: ['nIdUsuario'], unique: true }
+            { fields: ['nIdPalabra'], unique: true }
         ],
         freezeTableName: true,
-        modelName: 'tab_users',
+        modelName: 'tab_words',
     });
-    return tab_users;
+    return tab_words;
 };

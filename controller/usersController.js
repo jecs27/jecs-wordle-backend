@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const { errResponse } = require('../middleware/HandleError/HandleError');
 
-const { sequelize, users_test_jesuscalderon } = require('../models/database');
+const { sequelize, tab_users } = require('../models/database');
 const { Op } = require('sequelize');
 const { messageError } = require('../utils/strings');
 
@@ -19,29 +19,24 @@ const createUser = async(req, res) => {
     try {
         let {
             sNombre,
-            sSegundoNombre,
             sApellido_Paterno,
             sApellido_Materno,
-            dFechaNacimiento,
             sCorreo,
-            sTelefono,
+            sPassword
         } = req.body;
 
-        const [dataUser, created] = await users_test_jesuscalderon.findOrCreate({
+        const [dataUser, created] = await tab_users.findOrCreate({
             where: {
                 [Op.or]: [
                     { sCorreo: sCorreo.toLowerCase() },
-                    { sTelefono: sTelefono }
                 ]
             },
             defaults: {
                 sNombre: sNombre.toUpperCase(),
-                sSegundoNombre: sSegundoNombre.toUpperCase(),
                 sApellido_Paterno: sApellido_Paterno.toUpperCase(),
                 sApellido_Materno: sApellido_Materno.toUpperCase(),
-                dFechaNacimiento: dFechaNacimiento,
                 sCorreo: sCorreo.toLowerCase(),
-                sTelefono: sTelefono
+                sPassword: sPassword
             },
             raw: true,
             transaction: tran
@@ -49,6 +44,7 @@ const createUser = async(req, res) => {
         if (created) {
             delete dataUser.dataValues.dFechaRegistro;
             delete dataUser.dataValues.nEstatus;
+            delete dataUser.dataValues.sPassword;
 
             await tran.commit();
             return res.status(201).send({

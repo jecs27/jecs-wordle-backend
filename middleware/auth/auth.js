@@ -72,7 +72,7 @@ const validateInfo = async(data, sMW) => {
     if (sMW != undefined && sMW != 'undefined' && sMW != '') {
         sMW = await decryptString(sMW);
         let dataTkn = moment().format('DD.MM.YYYY') + await crearHashMd5("-JECS2712");
-        if (sMW == 'trc-2712' && data.sMW == dataTkn) {
+        if (sMW == 'dd360-2712' && data.sMW == dataTkn) {
             return true
         }
     } else {

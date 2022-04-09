@@ -2,10 +2,15 @@
 const moment = require("moment");
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-    class tab_users extends Model {
-        static associate(models) {}
+    class tab_board extends Model {
+        static associate(models) {
+            tab_board.belongsTo(models.tab_users, {
+                as: 'tab_users',
+                foreignKey: 'nIdUsuario',
+            });
+        }
     }
-    tab_users.init({
+    tab_board.init({
         dFechaRegistro: {
             type: DataTypes.DATE,
             allowNull: false,
@@ -14,38 +19,20 @@ module.exports = (sequelize, DataTypes) => {
                 return moment.utc(this.getDataValue('dFechaRegistro')).local().format('YYYY-MM-DD HH:mm:ss');
             }
         },
-        nIdUsuario: {
+        nIdBoard: {
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrementIdentity: true,
             autoIncrement: true,
             allowNull: false,
         },
-        sNombre: {
-            type: DataTypes.STRING(100),
+        nPalabrasJugadas: {
+            type: DataTypes.BIGINT,
             allowNull: false,
         },
-        sApellido_Paterno: {
-            type: DataTypes.STRING(100),
+        nPalabrasAcertadas: {
+            type: DataTypes.BIGINT,
             allowNull: false,
-        },
-        sApellido_Materno: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            defaultValue: ''
-        },
-        sCorreo: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-        },
-        sPassword: {
-            type: DataTypes.STRING(20),
-            allowNull: false,
-        },
-        nIntentos: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
         },
         sUuid: {
             type: DataTypes.UUID,
@@ -55,16 +42,16 @@ module.exports = (sequelize, DataTypes) => {
         nEstatus: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 1,
+            defaultValue: 0,
         },
     }, {
         sequelize,
         timestamps: false,
         indexes: [
-            { fields: ['nIdUsuario'], unique: true }
+            { fields: ['nIdBoard'], unique: true }
         ],
         freezeTableName: true,
-        modelName: 'tab_users',
+        modelName: 'tab_board',
     });
-    return tab_users;
+    return tab_board;
 };

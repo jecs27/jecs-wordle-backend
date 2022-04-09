@@ -8,11 +8,13 @@ const crearHashMd5 = async(str) => {
 
 //De momento se regresa mismo valor... solo dev
 const encryptString = (msg) => {
+    return msg; //solo dev
     let encToken = token_key + moment().format('DD%MM&YYYY') + new Date().getDay();
     return CryptoJS.AES.encrypt(msg.toString(), encToken).toString();
 }
 
 const decryptString = async(msg) => {
+    return msg; //solo dev
     let encToken = token_key + moment().format('DD%MM&YYYY') + new Date().getDay();
     let bytes = CryptoJS.AES.decrypt(msg, encToken);
     return bytes.toString(CryptoJS.enc.Utf8);

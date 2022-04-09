@@ -3,7 +3,7 @@ var router = express.Router();
 
 const {
     createUser,
-} = require('../controller/userController')
+} = require('../controller/usersController')
 
 const {
     createUserValidator
