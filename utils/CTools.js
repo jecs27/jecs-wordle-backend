@@ -31,8 +31,25 @@ const encryptObjKey = async(objData) => {
 
 }
 
+const changeKeyName = (arrObjData, keyname, replacename) => {
+    for (objData of arrObjData) {
+        let objKey = Object.keys(objData);
+        for (dataKey of objKey) {
+            if (dataKey.includes(keyname)) {
+                let newKey = dataKey.replace(keyname, replacename);
+                objData[newKey] = objData[dataKey];
+                delete objData[dataKey];
+            }
+        }
+        console.log(objData);
+    }
+
+    return objData;
+}
+
 module.exports = {
     crearHashMd5,
     decryptString,
     encryptObjKey,
+    changeKeyName,
 }

@@ -3,6 +3,7 @@ var router = express.Router();
 
 const {
     createUser,
+    getTopRanking,
 } = require('../controller/usersController')
 
 const {
@@ -12,6 +13,8 @@ const {
 const {
     verifyToken
 } = require('../middleware/auth/auth')
+
 router.post('/createUser', createUserValidator, verifyToken, createUser);
+router.get('/getTopRanking', getTopRanking);
 
 module.exports = router;

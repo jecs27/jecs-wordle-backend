@@ -30,12 +30,17 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 1,
         },
+        nVecesAcertada: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
         sUuid: {
             type: DataTypes.UUID,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4,
         },
-        nEstatus: { //0 - sin usar 1 - en uso 2-usada
+        nEstatus: { //0 - sin usar 1 - en uso 2 - usada
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,

@@ -1,9 +1,14 @@
 const { validationResult } = require('express-validator');
 const { errResponse } = require('../middleware/HandleError/HandleError');
 
-const { sequelize, tab_users } = require('../models/database');
+const { sequelize, tab_users, tab_board } = require('../models/database');
 const { Op } = require('sequelize');
 const { messageError } = require('../utils/strings');
+
+const {
+    decryptString,
+    changeKeyName
+} = require('../utils/CTools');
 
 
 const createUser = async(req, res) => {
@@ -46,6 +51,16 @@ const createUser = async(req, res) => {
             delete dataUser.dataValues.nEstatus;
             delete dataUser.dataValues.sPassword;
 
+            await tab_board.findOrCreate({
+                where: {
+                    nIdUsuario: dataUser.dataValues.nIdUsuario
+                },
+                defaults: {
+                    nIdUsuario: dataUser.dataValues.nIdUsuario
+                },
+                raw: true,
+                transaction: tran
+            });
             await tran.commit();
             return res.status(201).send({
                 status: 201,
@@ -78,8 +93,54 @@ const createUser = async(req, res) => {
     }
 }
 
+const getTopRanking = async(req, res) => {
+    const tran = await sequelize.transaction();
+    try {
+        const dataBoard = await tab_board.findAll({
+            limit: 10,
+            order: [
+                ['nPalabrasAcertadas', 'DESC'],
+            ],
+            attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'sUuid', 'nIdBoard', 'nIdUsuario'] },
+            include: [{
+                model: tab_users,
+                as: 'tab_users',
+                required: true,
+                attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'sPassword', 'nIntentos', 'sApellido_Materno', 'nIdUsuario'] }
+            }, ],
+            raw: true,
+            transaction: tran
+        });
 
+        await changeKeyName(dataBoard, 'tab_users.', '');
+
+        if (dataBoard.length > 0) {
+            await tran.commit();
+            return res.status(201).send({
+                status: 201,
+                message: 'Se ha registrado el usuario con éxito.',
+                data: dataBoard
+            });
+        } else {
+            await tran.rollback();
+            return res.status(400).send({
+                status: 400,
+                message: 'Ocurrió un error al intentar registrar al Usuario.',
+                data: {},
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        await tran.rollback();
+        return res.status(500).send({
+            status: 500,
+            message: 'Ocurrió un error al intentar obtener el top 10 Usuarios.',
+            data: { error: error.toString() }
+        });
+    }
+}
 
 module.exports = {
     createUser,
+    getTopRanking,
 }

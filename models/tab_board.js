@@ -29,10 +29,12 @@ module.exports = (sequelize, DataTypes) => {
         nPalabrasJugadas: {
             type: DataTypes.BIGINT,
             allowNull: false,
+            defaultValue: 0
         },
         nPalabrasAcertadas: {
             type: DataTypes.BIGINT,
             allowNull: false,
+            defaultValue: 0
         },
         sUuid: {
             type: DataTypes.UUID,

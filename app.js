@@ -1,17 +1,23 @@
 let fs = require('fs');
 var express = require('express');
 var path = require('path');
+var cron = require('node-cron');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
+
 const db = require('./models/database');
+const { changeActiveWord } = require('./controller/wordsController');
 
 async function crearDB() {
-    let bForceDB = true;
+    let bForceDB = false;
     await db.sequelize
         .sync({ force: bForceDB })
-        .then(() => {
-            llenaDiccionario();
+        .then(async() => {
+            if (bForceDB) {
+                await llenaDiccionario();
+                changeActiveWord();
+            }
             return Promise.resolve();
         })
         .catch(err => {
@@ -44,6 +50,7 @@ async function llenaDiccionario() {
             }
         });
         await tran.commit();
+        return true;
     } catch (error) {
         await tran.rollback();
     }
@@ -57,13 +64,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 let {
     userRoute,
-    utilsRoute
+    utilsRoute,
+    wordsRoute,
 } = require("./routes/");
 
 app.use('/users', userRoute);
 app.use('/utils', utilsRoute);
+app.use('/word', wordsRoute);
+
+
+cron.schedule('*/5 * * * *', () => {
+    changeActiveWord();
+}, {
+    scheduled: true,
+    timezone: "America/Mazatlan"
+});
 
 module.exports = app;
