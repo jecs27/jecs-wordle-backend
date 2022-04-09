@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(25),
             allowNull: false,
         },
+        nLongitud: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1,
+        },
         sUuid: {
             type: DataTypes.UUID,
             allowNull: false,
