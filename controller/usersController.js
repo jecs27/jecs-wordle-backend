@@ -10,6 +10,10 @@ const {
     changeKeyName
 } = require('../utils/CTools');
 
+const {
+    generateToken
+} = require('../middleware/auth/auth');
+
 
 const createUser = async(req, res) => {
     let err = await errResponse(validationResult(req), res, 'error');
@@ -196,8 +200,64 @@ const getGamesPlayed = async(req, res) => {
     }
 }
 
+const loginUser = async(req, res) => {
+    let err = await errResponse(validationResult(req), res, 'error');
+    if (err !== null) {
+        return res.status(422).send({
+            status: 422,
+            message: messageError,
+            data: {}
+        });
+    }
+    const tran = await sequelize.transaction();
+    try {
+        let {
+            sCorreo,
+            sPassword
+        } = req.body;
+
+        const dataUser = await tab_users.findOne({
+            where: {
+                sCorreo: sCorreo.toLowerCase(),
+                sPassword: sPassword
+            },
+            attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'sPassword', 'nIntentos', 'sApellido_Materno', ] },
+            raw: true,
+            transaction: tran
+        });
+        if (dataUser) {
+            let sToken = await generateToken({ uuid: dataUser.sUuid });
+            await tran.commit();
+            return res.status(200).send({
+                status: 200,
+                message: '_OK_',
+                data: {
+                    user: dataUser,
+                    token: sToken
+                }
+            });
+        } else {
+            await tran.rollback();
+            return res.status(400).send({
+                status: 400,
+                message: 'Ocurrió un error al intentar ingresar.',
+                data: {},
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        await tran.rollback();
+        return res.status(500).send({
+            status: 500,
+            message: 'Ocurrió un error al intentar realizar login de Usuario.',
+            data: { error: error.toString() }
+        });
+    }
+}
+
 module.exports = {
     createUser,
     getTopRanking,
     getGamesPlayed,
+    loginUser,
 }

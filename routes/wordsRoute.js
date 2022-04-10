@@ -4,15 +4,19 @@ var router = express.Router();
 const {
     getActiveWord,
     getMoreAccurateWord,
-    checkWord
+    checkWord,
 } = require('../controller/wordsController')
 
 const {
     getActiveWordValidator,
 } = require('../middleware/validators/wordsValidators');
 
-router.post('/getActiveWord', getActiveWordValidator, getActiveWord);
-router.post('/getMoreAccurateWord', getMoreAccurateWord);
-router.post('/checkWord', checkWord);
+const {
+    verifyTokenLogin
+} = require('../middleware/auth/auth')
+
+router.post('/getActiveWord', getActiveWordValidator, verifyTokenLogin, getActiveWord);
+router.get('/getMoreAccurateWord', verifyTokenLogin, getMoreAccurateWord);
+router.post('/checkWord', verifyTokenLogin, checkWord);
 
 module.exports = router;

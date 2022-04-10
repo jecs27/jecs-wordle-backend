@@ -5,6 +5,7 @@ const {
     createUser,
     getTopRanking,
     getGamesPlayed,
+    loginUser,
 } = require('../controller/usersController')
 
 const {
@@ -12,11 +13,13 @@ const {
 } = require('../middleware/validators/userValidators')
 
 const {
-    verifyToken
+    verifyToken,
+    verifyTokenLogin
 } = require('../middleware/auth/auth')
 
 router.post('/createUser', createUserValidator, verifyToken, createUser);
-router.get('/getTopRanking', getTopRanking);
-router.post('/getGamesPlayed', getGamesPlayed);
+router.get('/getTopRanking', verifyTokenLogin, getTopRanking);
+router.post('/getGamesPlayed', verifyTokenLogin, getGamesPlayed);
+router.post('/loginUser', verifyToken, loginUser);
 
 module.exports = router;

@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "start": "node ./bin/www",
-        "test": "jest"
+        "test": "jest --forceExit"
     },
     "dependencies": {
         "axios": "^0.26.1",

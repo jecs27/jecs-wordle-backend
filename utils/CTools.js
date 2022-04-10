@@ -24,7 +24,6 @@ const decryptString = async(msg) => {
 const encryptObjKey = async(objData) => {
     let objKey = Object.keys(objData);
     for (let objDataInfo of objKey) {
-        console.log(objData[objDataInfo]);
         objData[objDataInfo] = await encryptString(objData[objDataInfo])
     }
     return objData;
@@ -41,7 +40,6 @@ const changeKeyName = (arrObjData, keyname, replacename) => {
                 delete objData[dataKey];
             }
         }
-        console.log(objData);
     }
 
     return objData;

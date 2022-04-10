@@ -147,14 +147,6 @@ const changeActiveWord = async() => {
 }
 
 const getMoreAccurateWord = async(req, res) => {
-    let err = await errResponse(validationResult(req), res, 'error');
-    if (err !== null) {
-        return res.status(422).send({
-            status: 422,
-            message: messageError,
-            data: {}
-        });
-    }
     const tran = await sequelize.transaction();
     try {
         const dataWord = await tab_words.findOne({
@@ -166,7 +158,6 @@ const getMoreAccurateWord = async(req, res) => {
             raw: true,
             transaction: tran
         });
-
         if (dataWord) {
             await tran.commit();
             return res.status(200).send({
