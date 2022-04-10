@@ -203,7 +203,8 @@ const checkWord = async(req, res) => {
     try {
         let {
             sIdUser,
-            user_word
+            user_word,
+            sIdWord
         } = req.body;
 
         const dataUser = await tab_users.findOne({
@@ -225,6 +226,14 @@ const checkWord = async(req, res) => {
             });
 
             if (dataWord) {
+                if (dataWord.sUuid === sIdWord) {
+                    await tran.commit();
+                    return res.status(409).send({
+                        status: 409,
+                        message: 'La palabra ha cambiado.',
+                        data: {}
+                    });
+                }
                 let nCorrect = 0;
                 let arrWord = dataWord.sPalabra.split('');
                 let arrUserWord = user_word.split('');
@@ -298,7 +307,6 @@ const checkWord = async(req, res) => {
                         });
                     }
                 }
-
                 await tran.commit();
                 return res.status(200).send({
                     status: 200,
