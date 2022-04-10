@@ -10,7 +10,7 @@ const db = require('./models/database');
 const { changeActiveWord } = require('./controller/wordsController');
 
 async function crearDB() {
-    let bForceDB = true;
+    let bForceDB = false;
     await db.sequelize
         .sync({ force: bForceDB })
         .then(async() => {

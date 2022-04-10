@@ -116,16 +116,16 @@ const getTopRanking = async(_req, res) => {
 
         if (dataBoard.length > 0) {
             await tran.commit();
-            return res.status(201).send({
-                status: 201,
-                message: 'Se ha registrado el usuario con éxito.',
+            return res.status(200).send({
+                status: 200,
+                message: '_OK',
                 data: dataBoard
             });
         } else {
             await tran.rollback();
             return res.status(400).send({
                 status: 400,
-                message: 'Ocurrió un error al intentar registrar al Usuario.',
+                message: 'Ocurrió un error al intentar obtener el top 10 Usuarios..',
                 data: {},
             });
         }
@@ -140,7 +140,64 @@ const getTopRanking = async(_req, res) => {
     }
 }
 
+const getGamesPlayed = async(req, res) => {
+    let err = await errResponse(validationResult(req), res, 'error');
+    if (err !== null) {
+        return res.status(422).send({
+            status: 422,
+            message: messageError,
+            data: {}
+        });
+    }
+    const tran = await sequelize.transaction();
+    try {
+        let {
+            sIdUsuario
+        } = req.body;
+
+        const dataBoard = await tab_board.findOne({
+            attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'sUuid', 'nIdBoard', 'nIdUsuario'] },
+            include: [{
+                model: tab_users,
+                as: 'tab_users',
+                where: {
+                    sUuid: sIdUsuario
+                },
+                required: true,
+                attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'sPassword', 'nIntentos', 'sApellido_Materno', ] }
+            }, ],
+            raw: true,
+            transaction: tran
+        });
+
+        if (dataBoard) {
+            await tran.commit();
+            return res.status(200).send({
+                status: 200,
+                message: '_OK',
+                data: dataBoard
+            });
+        } else {
+            await tran.rollback();
+            return res.status(400).send({
+                status: 400,
+                message: 'Ocurrió un error al intentar obtener número de juegos realizados.',
+                data: {},
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        await tran.rollback();
+        return res.status(500).send({
+            status: 500,
+            message: 'Ocurrió un error al intentar obtener número de juegos realizados.',
+            data: { error: error.toString() }
+        });
+    }
+}
+
 module.exports = {
     createUser,
     getTopRanking,
+    getGamesPlayed,
 }
