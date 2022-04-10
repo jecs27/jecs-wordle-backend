@@ -3,7 +3,7 @@ const moment = require("moment");
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class tab_words extends Model {
-        static associate(models) {}
+
     }
     tab_words.init({
         dFechaRegistro: {

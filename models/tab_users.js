@@ -3,7 +3,7 @@ const moment = require("moment");
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class tab_users extends Model {
-        static associate(models) {}
+
     }
     tab_users.init({
         dFechaRegistro: {
@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         nIntentos: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+        nAcertoPalabraActual: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,

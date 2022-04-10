@@ -108,7 +108,10 @@ const changeActiveWord = async() => {
                 transaction: tran
             });
 
-            await tab_users.update({ nIntentos: 0 }, {
+            await tab_users.update({
+                nIntentos: 0,
+                nAcertoPalabraActual: 0
+            }, {
                 where: {
                     nIdUsuario: {
                         [Op.ne]: 0
@@ -215,6 +218,17 @@ const checkWord = async(req, res) => {
             transaction: tran
         });
 
+        if (dataUser.nAcertoPalabraActual === 1) {
+            return res.status(200).send({
+                status: 200,
+                message: 'El usuario ya ha acertado anteriormete, espere al cambio de palabra.',
+                data: {
+                    bAcertoPalabra: 1,
+                    letter: {}
+                }
+
+            });
+        }
         if (dataUser.nIntentos < 5) {
             const dataWord = await tab_words.findOne({
                 where: {
@@ -257,15 +271,7 @@ const checkWord = async(req, res) => {
                         });
                     }
                 }
-
-                await tab_users.update({ nIntentos: parseInt(dataUser.nIntentos) + 1 }, {
-                    returning: true,
-                    where: {
-                        sUuid: sIdUser
-                    },
-                    transaction: tran
-                });
-
+                //Si estan correctas las 5 letras finalizar juego con dicha palabra
                 if (nCorrect === 5) {
                     const dataBoard = await tab_board.findOne({
                         where: {
@@ -284,6 +290,27 @@ const checkWord = async(req, res) => {
                         },
                         returning: true,
                         transaction: tran
+                    });
+
+                    await tab_users.update({
+                        nIntentos: parseInt(dataUser.nIntentos) + 1,
+                        nAcertoPalabraActual: 1
+                    }, {
+                        returning: true,
+                        where: {
+                            sUuid: sIdUser
+                        },
+                        transaction: tran
+                    });
+                    await tran.commit();
+                    return res.status(200).send({
+                        status: 200,
+                        message: 'El usuario ha acertado la palabra',
+                        data: {
+                            bAcertoPalabra: 1,
+                            letter: objResponse
+                        }
+
                     });
                 } else {
                     const nIntentos = parseInt(dataUser.nIntentos) + 1;
@@ -307,11 +334,15 @@ const checkWord = async(req, res) => {
                         });
                     }
                 }
+
                 await tran.commit();
                 return res.status(200).send({
                     status: 200,
                     message: '_OK_',
-                    data: objResponse
+                    data: {
+                        bAcertoPalabra: 0,
+                        letter: objResponse
+                    }
                 });
             } else {
                 await tran.commit();

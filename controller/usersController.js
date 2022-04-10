@@ -93,7 +93,7 @@ const createUser = async(req, res) => {
     }
 }
 
-const getTopRanking = async(req, res) => {
+const getTopRanking = async(_req, res) => {
     const tran = await sequelize.transaction();
     try {
         const dataBoard = await tab_board.findAll({
