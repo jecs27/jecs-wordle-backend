@@ -112,9 +112,55 @@ const changeActiveWord = async() => {
     }
 }
 
+const getMoreAccurateWord = async(req, res) => {
+    let err = await errResponse(validationResult(req), res, 'error');
+    if (err !== null) {
+        return res.status(422).send({
+            status: 422,
+            message: messageError,
+            data: {}
+        });
+    }
+    const tran = await sequelize.transaction();
+    try {
+        const dataWord = await tab_words.findOne({
+            limit: 1,
+            order: [
+                ['nVecesAcertada', 'DESC'],
+            ],
+            attributes: { exclude: ['dFechaRegistro', 'nEstatus', 'nIdPalabra'] },
+            raw: true,
+            transaction: tran
+        });
 
+        if (dataWord) {
+            await tran.commit();
+            return res.status(200).send({
+                status: 200,
+                message: '_OK_',
+                data: dataWord
+            });
+        } else {
+            await tran.commit();
+            return res.status(404).send({
+                status: 404,
+                message: 'No se encontraron datos de palabras.',
+                data: {}
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        await tran.rollback();
+        return res.status(500).send({
+            status: 500,
+            message: 'Ocurrió un error al intentar obtener la palabra.',
+            data: { error: error.toString() }
+        });
+    }
+}
 
 module.exports = {
     getActiveWord,
     changeActiveWord,
+    getMoreAccurateWord
 }

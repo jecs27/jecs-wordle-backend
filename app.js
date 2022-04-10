@@ -74,7 +74,6 @@ app.use('/users', userRoute);
 app.use('/utils', utilsRoute);
 app.use('/word', wordsRoute);
 
-
 cron.schedule('*/5 * * * *', () => {
     changeActiveWord();
 }, {
